@@ -27,7 +27,6 @@ jobs:
         run: |
           pip install ansible==5.10.0
           pip install molecule==5.0.1
-          pip install docker==1.6.0
           pip isntall ansible-compat==3.0.2
           pip install "molecule[docker.lint]"
           pip install molecule-docker
@@ -38,7 +37,6 @@ jobs:
         run: |
           /opt/pipx/venvs/ansible-core/bin/python -m pip install ansible==5.10.0
           /opt/pipx/venvs/ansible-core/bin/python -m pip install molecule==5.0.1
-          /opt/pipx/venvs/ansible-core/bin/python -m pip install docker==1.6.0
           /opt/pipx/venvs/ansible-core/bin/python -m pip install ansible-compat==3.0.2
           /opt/pipx/venvs/ansible-core/bin/python -m pip install "molecule[docker.lint]"
           /opt/pipx/venvs/ansible-core/bin/python -m pip install molecule-docker
