@@ -26,21 +26,23 @@ jobs:
       - name: Install depencencies
         run: |
           pip install ansible==5.10.0
-          pip install molecule==3.5.2
+          pip install molecule==5.0.1
+          pip install docker==1.6.0
+          pip isntall ansible-compat==3.0.2
           pip install "molecule[docker.lint]"
           pip install molecule-docker
           pip install molecule-hetznercloud
-          pip install docker
           pip install hcloud
           ansible-galaxy collection install community.docker
       - name: Install dependency for pipx
         run: |
           /opt/pipx/venvs/ansible-core/bin/python -m pip install ansible==5.10.0
           /opt/pipx/venvs/ansible-core/bin/python -m pip install molecule==5.0.1
+          /opt/pipx/venvs/ansible-core/bin/python -m pip install docker==1.6.0
+          /opt/pipx/venvs/ansible-core/bin/python -m pip install ansible-compat==3.0.2
           /opt/pipx/venvs/ansible-core/bin/python -m pip install "molecule[docker.lint]"
           /opt/pipx/venvs/ansible-core/bin/python -m pip install molecule-docker
           /opt/pipx/venvs/ansible-core/bin/python -m pip install molecule-hetznercloud
-          /opt/pipx/venvs/ansible-core/bin/python -m pip install docker
           /opt/pipx/venvs/ansible-core/bin/python -m pip install hcloud
       - name: Install ansible-lint
         run: sudo apt-get install -y ansible-lint
