@@ -27,7 +27,7 @@ jobs:
         run: |
           pip install ansible==5.10.0
           pip install molecule==5.0.1
-          pip isntall ansible-compat==3.0.2
+          pip install ansible-compat==3.0.2
           pip install "molecule[docker.lint]"
           pip install molecule-docker
           pip install molecule-hetznercloud
