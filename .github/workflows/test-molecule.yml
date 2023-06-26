@@ -27,7 +27,6 @@ jobs:
         run: |
           pip install ansible==5.10.0
           pip install molecule==5.0.1
-          pip install ansible-compat==3.0.2
           pip install "molecule[docker.lint]"
           pip install molecule-docker
           pip install molecule-hetznercloud
@@ -37,7 +36,6 @@ jobs:
         run: |
           /opt/pipx/venvs/ansible-core/bin/python -m pip install ansible==5.10.0
           /opt/pipx/venvs/ansible-core/bin/python -m pip install molecule==5.0.1
-          /opt/pipx/venvs/ansible-core/bin/python -m pip install ansible-compat==3.0.2
           /opt/pipx/venvs/ansible-core/bin/python -m pip install "molecule[docker.lint]"
           /opt/pipx/venvs/ansible-core/bin/python -m pip install molecule-docker
           /opt/pipx/venvs/ansible-core/bin/python -m pip install molecule-hetznercloud
