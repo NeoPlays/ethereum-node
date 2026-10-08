@@ -42,20 +42,18 @@ export async function useListKeys(forceRefresh) {
           });
         }
 
-        //update service config (pinia)
-        client.config.keys = result.data
+        const keys = result.data
           ? result.data.map((e) => {
               return { key: e.validating_pubkey, isRemote: e.readonly, dvt: e.dvt ? e.dvt : false };
             })
           : [];
+        client.config.keys = keys;
 
-        //update service datasets in Pinia store
-        serviceStore.installedServices = serviceStore.installedServices.map((service) => {
-          if (service.id === client.id) {
-            return client;
-          }
-          return service;
-        });
+        // The 2s service refresh may have replaced this client in the store while its keys were listed.
+        // Write them onto the current entry instead of putting the stale object back (by index), which
+        // made the key counts vanish and reappear.
+        const current = serviceStore.installedServices.find((s) => s.config?.serviceID === client.config.serviceID);
+        if (current && current !== client) current.config.keys = keys;
       }
 
       if (client.config.keys) {
