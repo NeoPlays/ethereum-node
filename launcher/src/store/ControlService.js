@@ -761,6 +761,89 @@ class ControlService extends EventEmitter {
     return this.promiseIpc.send("getObolClusterInformation", { serviceID });
   }
 
+  async getValidatorHolders() {
+    return this.promiseIpc.send("getValidatorHolders");
+  }
+
+  async listHolderKeys(serviceID) {
+    return this.promiseIpc.send("listHolderKeys", { serviceID });
+  }
+
+  async getHolderValidatorStates(pubkeys, serviceID) {
+    return this.promiseIpc.send("getHolderValidatorStates", { pubkeys, serviceID });
+  }
+
+  async getKeyFeeRecipient(serviceID, pubkey) {
+    return this.promiseIpc.send("getKeyFeeRecipient", { serviceID, pubkey });
+  }
+
+  async getKeyGraffiti(serviceID, pubkey) {
+    return this.promiseIpc.send("getKeyGraffiti", { serviceID, pubkey });
+  }
+
+  // setting: "graffiti" | "feerecipient", value null resets it to the client default
+  async setKeySetting(serviceID, pubkeys, setting, value) {
+    return this.promiseIpc.send("setKeySetting", { serviceID, pubkeys, setting, value });
+  }
+
+  // patch: { pubkey: { keyName?, groupName?, groupID?, validatorClientID? } }, merged per key into /etc/stereum/keys.yaml
+  async writeKeyEntries(patch) {
+    return this.promiseIpc.send("writeKeyEntries", { patch });
+  }
+
+  // local: keystores (slashing protection exported), remote: remote keys
+  async removeKeys(serviceID, local, remote) {
+    return this.promiseIpc.send("removeKeys", { serviceID, local, remote });
+  }
+
+  // remoteUrl: the signer remote keys would be imported from, null for keystores
+  async prepareKeyImport(serviceID, pubkeys, remoteUrl = null) {
+    return this.promiseIpc.send("prepareKeyImport", { serviceID, pubkeys, remoteUrl });
+  }
+
+  // one of signerId (Web3Signer on this node) or url (any signer reachable from the stereum network)
+  async listSignerKeys({ signerId = null, url = null }) {
+    return this.promiseIpc.send("listSignerKeys", { signerId, url });
+  }
+
+  async importValidatorRemoteKeys(serviceID, pubkeys, url) {
+    return this.promiseIpc.send("importValidatorRemoteKeys", { serviceID, pubkeys, url });
+  }
+
+  // keystores and passwords as texts in the same order, slashingProtection as EIP-3076 text or null
+  async importValidatorKeys(serviceID, keystores, passwords, slashingProtection) {
+    return this.promiseIpc.send("importValidatorKeys", { serviceID, keystores, passwords, slashingProtection });
+  }
+
+  async prepareKeyExit(serviceID, pubkeys) {
+    return this.promiseIpc.send("prepareKeyExit", { serviceID, pubkeys });
+  }
+
+  async exitValidatorKeys(serviceID, pubkeys) {
+    return this.promiseIpc.send("exitValidatorKeys", { serviceID, pubkeys });
+  }
+
+  // the only call that returns signed exits
+  async exportExitMessages(serviceID, pubkeys) {
+    return this.promiseIpc.send("exportExitMessages", { serviceID, pubkeys });
+  }
+
+  async getHolderDuties(serviceID, indices) {
+    return this.promiseIpc.send("getHolderDuties", { serviceID, indices });
+  }
+
+  async getHolderRewards(serviceID, request) {
+    return this.promiseIpc.send("getHolderRewards", { serviceID, request });
+  }
+
+  async getHolderClusterStats(serviceID) {
+    return this.promiseIpc.send("getHolderClusterStats", { serviceID });
+  }
+
+  async getCsmKeys(force = false) {
+    return this.promiseIpc.send("getCsmKeys", { force });
+  }
+
   async getSSVClusterInformation(serviceID) {
     return this.promiseIpc.send("getSSVClusterInformation", { serviceID });
   }

@@ -4063,6 +4063,10 @@ export class Monitoring {
     stats.private = data.data.is_private;
     stats.status = data.data.status;
     stats.performance = data.data.performance["24h"];
+    // read by the validators page only
+    stats.name = data.data.name;
+    stats.validators = data.data.validators_count;
+    stats.performance30d = data.data.performance["30d"];
     return stats;
   }
 }

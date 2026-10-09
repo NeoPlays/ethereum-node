@@ -8,6 +8,7 @@ import { ServiceManager } from "./backend/ServiceManager.js";
 import { ValidatorAccountManager } from "./backend/ValidatorAccountManager.js";
 import { TaskManager } from "./backend/TaskManager.js";
 import { Monitoring } from "./backend/Monitoring.js";
+import { Validators } from "./backend/Validators.js";
 import { StereumUpdater } from "./StereumUpdater.js";
 import { ConfigManager } from "./backend/ConfigManager.js";
 import { AuthenticationService } from "./backend/AuthenticationService.js";
@@ -17,7 +18,7 @@ import { ProtocolHandler } from "./backend/CustomUrlProtocol.js";
 import path from "path";
 import { readFileSync, existsSync, mkdirSync, renameSync, readdir, rmSync } from "fs";
 import url from "url";
-import { checkSigningKeys, getSigningKeysWithQueueInfo } from "./backend/web3/CSM.js";
+import { checkSigningKeys } from "./backend/web3/CSM.js";
 // Use Electron's runtime packaged flag rather than process.env.NODE_ENV: after the
 // electron-vite migration NODE_ENV is no longer statically inlined into the main
 // bundle, so it is undefined in packaged builds (which wrongly made isDevelopment true).
@@ -26,6 +27,7 @@ const nodeConnection = new NodeConnection();
 const storageService = new StorageService();
 const taskManager = new TaskManager(nodeConnection);
 const monitoring = new Monitoring(nodeConnection);
+const validators = new Validators(monitoring);
 const oneClickInstall = new OneClickInstall();
 const serviceManager = new ServiceManager(nodeConnection);
 const validatorAccountManager = new ValidatorAccountManager(nodeConnection, serviceManager);
@@ -134,6 +136,7 @@ ipcMain.handle("closeTunnels", async () => {
 });
 
 ipcMain.handle("logout", async () => {
+  validators.reset();
   await monitoring.logout();
   return await nodeConnection.logout();
 });
@@ -853,11 +856,90 @@ ipcMain.handle("getCSMQueue", async (event, args) => {
 });
 
 ipcMain.handle("getSigningKeysWithQueueInfo", async () => {
-  return await getSigningKeysWithQueueInfo(monitoring);
+  return await validators.csmSigningKeys();
 });
 
 ipcMain.handle("getObolClusterInformation", async (event, args) => {
   return await monitoring.getObolClusterInformation(args.serviceID);
+});
+
+// validators page (staking page rebuild)
+ipcMain.handle("getValidatorHolders", async () => {
+  return await validators.getValidatorHolders();
+});
+
+ipcMain.handle("listHolderKeys", async (event, args) => {
+  return await validators.listHolderKeys(args.serviceID);
+});
+
+ipcMain.handle("getHolderValidatorStates", async (event, args) => {
+  return await validators.getValidatorStates(args.pubkeys, args.serviceID);
+});
+
+ipcMain.handle("getKeyFeeRecipient", async (event, args) => {
+  return await validators.getFeeRecipient(args.serviceID, args.pubkey);
+});
+
+ipcMain.handle("getKeyGraffiti", async (event, args) => {
+  return await validators.getGraffiti(args.serviceID, args.pubkey);
+});
+
+ipcMain.handle("setKeySetting", async (event, args) => {
+  return await validators.setKeySetting(args.serviceID, args.pubkeys, args.setting, args.value);
+});
+
+ipcMain.handle("removeKeys", async (event, args) => {
+  return await validators.removeKeys(args.serviceID, { local: args.local, remote: args.remote });
+});
+
+ipcMain.handle("prepareKeyImport", async (event, args) => {
+  return await validators.prepareImport(args.serviceID, args.pubkeys, { remoteUrl: args.remoteUrl });
+});
+
+ipcMain.handle("importValidatorKeys", async (event, args) => {
+  return await validators.importKeys(args.serviceID, args.keystores, args.passwords, args.slashingProtection);
+});
+
+ipcMain.handle("writeKeyEntries", async (event, args) => {
+  return await validators.writeKeyEntries(args.patch);
+});
+
+ipcMain.handle("listSignerKeys", async (event, args) => {
+  return await validators.listSignerKeys({ signerId: args.signerId, url: args.url });
+});
+
+ipcMain.handle("importValidatorRemoteKeys", async (event, args) => {
+  return await validators.importRemoteKeys(args.serviceID, args.pubkeys, args.url);
+});
+
+ipcMain.handle("prepareKeyExit", async (event, args) => {
+  const result = await validators.prepareExit(args.serviceID, args.pubkeys);
+  delete result.target; // target stays in the backend
+  return result;
+});
+
+ipcMain.handle("exitValidatorKeys", async (event, args) => {
+  return await validators.exitKeys(args.serviceID, args.pubkeys);
+});
+
+ipcMain.handle("exportExitMessages", async (event, args) => {
+  return await validators.exportExitMessages(args.serviceID, args.pubkeys);
+});
+
+ipcMain.handle("getHolderDuties", async (event, args) => {
+  return await validators.getDuties(args.serviceID, args.indices);
+});
+
+ipcMain.handle("getHolderRewards", async (event, args) => {
+  return await validators.getRewards(args.serviceID, args.request);
+});
+
+ipcMain.handle("getHolderClusterStats", async (event, args) => {
+  return await validators.getClusterStats(args.serviceID);
+});
+
+ipcMain.handle("getCsmKeys", async (event, args) => {
+  return await validators.getCsmKeys(args?.force);
 });
 
 ipcMain.handle("getSSVClusterInformation", async (event, args) => {

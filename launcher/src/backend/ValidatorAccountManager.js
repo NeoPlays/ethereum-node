@@ -521,7 +521,15 @@ export class ValidatorAccountManager {
     }
   }
 
-  async writeKeys(keys) {
+  // queued with the validators page writes, so read-modify-writes of keys.yaml never interleave
+  writeKeys(keys) {
+    const run = () => this.writeKeysNow(keys);
+    const queue = this.nodeConnection;
+    queue.keysWrite = (queue.keysWrite ?? Promise.resolve()).then(run, run);
+    return queue.keysWrite;
+  }
+
+  async writeKeysNow(keys) {
     //get current keys in yaml file
     let currentKeys = await this.readKeys();
     if (!currentKeys) {
